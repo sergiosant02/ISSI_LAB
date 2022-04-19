@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { StyleSheet, Button, Text, View, FlatList, Pressable } from 'react-native'
 import { getAll } from '../../api/RestaurantEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextSemiBold from '../../components/TextSemibold'
 import TextRegular from '../../components/TextRegular'
+import AuthorizationContext from '../../context/AuthorizationContext'
+import { showMessage } from 'react-native-flash-message'
 
 import { brandPrimary, brandSecondary } from '../../styles/GlobalStyles'
 
@@ -12,12 +14,25 @@ export default function RestaurantsScreen ({ navigation }) {
   const [restaurants, setRestaurants] = useState([])
 
   useEffect(() => {
-    console.log('Loading restaurants, please wait 2 seconds')
-    setTimeout(() => {
-      setRestaurants(getAll) // getAll function has to be imported
-      console.log('Restaurants loaded')
-    }, 0)
-  }, [])
+    async function fetchRestaurants () { // Addresses problem 1
+      try {
+        const fetchedRestaurants = await getAll()
+        setRestaurants(fetchedRestaurants)
+      } catch (error) { // Addresses problem 3
+        showMessage({
+          message: `There was an error while retrieving restaurants. ${error} `,
+          type: 'error',
+          style: flashStyle,
+          titleStyle: flashTextStyle
+        })
+      }
+    }
+    if (loggedInUser) { // Addresses problem 2
+      fetchRestaurants()
+    } else {
+      setRestaurants(null)
+    }
+  }, [loggedInUser]) // Addresses problem 2
 
   const renderRestaurant = ({ item }) => {
     return (
@@ -46,6 +61,8 @@ export default function RestaurantsScreen ({ navigation }) {
     />
   )
 }
+
+const {loggedInUser} = useContext(AuthorizationContext)
 
 const styles = StyleSheet.create({
   container: {

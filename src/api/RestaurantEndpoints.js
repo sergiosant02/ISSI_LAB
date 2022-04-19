@@ -1,6 +1,6 @@
-
+import {get} from './helpers/ApiRequestsHelper'
 function getAll () {
-  return restaurantsMock
+  return get('/users/myRestaurants')
 }
 
 function getDetail (id) {
