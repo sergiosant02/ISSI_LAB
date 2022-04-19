@@ -5,17 +5,29 @@ import { getDetail } from '../../api/RestaurantEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextRegular from '../../components/TextRegular'
 import TextSemiBold from '../../components/TextSemibold'
-import { brandSecondary } from '../../styles/GlobalStyles'
+import { brandSecondary, flashStyle, flashTextStyle } from '../../styles/GlobalStyles'
+import { showMessage } from 'react-native-flash-message'
+
+
 
 export default function RestaurantDetailScreen ({ route }) {
   const [restaurant, setRestaurant] = useState({})
 
   useEffect(() => {
-    console.log('Loading restaurant details, please wait 1 second')
-    setTimeout(() => {
-      setRestaurant(getDetail(route.params.id))
-      console.log('Restaurant details loaded')
-    }, 1000)
+    async function fetchRestaurant (){
+      try {
+        const fetchData = await getDetail(route.params.id)
+        setRestaurant(fetchData);
+      } catch (error) {
+        showMessage({
+          message: `There was an error while retrieving restaurants. ${error} `,
+          type: 'error',
+          style: flashStyle,
+          titleStyle: flashTextStyle
+        })
+      }
+    }
+    fetchRestaurant()
   }, [])
 
   const renderHeader = () => {

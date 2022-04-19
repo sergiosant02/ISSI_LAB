@@ -5,15 +5,17 @@ import { getAll } from '../../api/RestaurantEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextSemiBold from '../../components/TextSemibold'
 import TextRegular from '../../components/TextRegular'
-import AuthorizationContext from '../../context/AuthorizationContext'
+import {AuthorizationContext} from '../../context/AuthorizationContext'
 import { showMessage } from 'react-native-flash-message'
 
 import { brandPrimary, brandSecondary } from '../../styles/GlobalStyles'
 
 export default function RestaurantsScreen ({ navigation }) {
   const [restaurants, setRestaurants] = useState([])
-
+  const {loggedInUser} = useContext(AuthorizationContext)
+  
   useEffect(() => {
+    
     async function fetchRestaurants () { // Addresses problem 1
       try {
         const fetchedRestaurants = await getAll()
@@ -62,7 +64,7 @@ export default function RestaurantsScreen ({ navigation }) {
   )
 }
 
-const {loggedInUser} = useContext(AuthorizationContext)
+
 
 const styles = StyleSheet.create({
   container: {
